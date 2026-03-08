@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LvxShop — Become Stronger</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--p:#9b30ff;--p2:#7c3aed;--p3:#c084fc;--p4:#6d28d9;--bg:#050508;--bg2:#08080f;--bg3:#0d0d18;--card:#0a0a12;--border:#1a1a2e;--mu:#5a5a8a}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:#fff;font-family:'Rajdhani',sans-serif;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cur{position:fixed;width:10px;height:10px;background:var(--p);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 15px var(--p),0 0 30px rgba(155,48,255,.4);transition:width .15s,height .15s,background .15s;top:0;left:0}
+#cur2{position:fixed;width:32px;height:32px;border:1px solid rgba(155,48,255,.45);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);top:0;left:0;transition:top .06s,left .06s}
+
+/* CANVAS */
+#bgC{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* SCANLINES */
+.sl{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.05) 2px,rgba(0,0,0,.05) 4px)}
+
+
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:68px;background:rgba(5,5,8,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(155,48,255,.1)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-t{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:4px;background:linear-gradient(135deg,#fff,#c084fc,#ff2d78);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;gap:30px}
+.nav-links a{color:var(--mu);text-decoration:none;font-size:.8rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--p),var(--pk));transform:scaleX(0);transition:transform .3s}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-r{display:flex;align-items:center;gap:10px}
+.btn-cart{background:transparent;border:1px solid rgba(155,48,255,.35);color:#fff;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.5px;transition:all .3s;position:relative}
+.btn-cart:hover{border-color:var(--p);box-shadow:0 0 15px rgba(155,48,255,.3);background:rgba(155,48,255,.08)}
+.cbadge{position:absolute;top:-7px;right:-7px;background:var(--p);color:#fff;font-size:.6rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 0 8px var(--p)}
+.btn-dc-nav{background:linear-gradient(135deg,#5865F2,#7289da);color:#fff;padding:8px 16px;border-radius:4px;text-decoration:none;font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .3s;font-family:'Rajdhani',sans-serif;letter-spacing:.5px}
+.btn-dc-nav:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(88,101,242,.5)}
+.btn-dash{background:linear-gradient(135deg,var(--p),var(--pk));color:#fff;padding:8px 16px;border-radius:4px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:.5px;transition:all .3s}
+.btn-dash:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(155,48,255,.5)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 20px 60px;position:relative;z-index:1;overflow:hidden}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(155,48,255,.4);background:rgba(155,48,255,.06);color:#9b72ff;padding:6px 18px;border-radius:2px;font-size:.7rem;margin-bottom:28px;font-family:'Share Tech Mono',monospace;letter-spacing:3px;animation:fup .8s ease .2s both}
+.hbdot{width:7px;height:7px;background:#22c55e;border-radius:50%;box-shadow:0 0 8px #22c55e;animation:pls 2s infinite}
+@keyframes pls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4.5rem,13vw,11rem);line-height:.88;letter-spacing:6px;margin-bottom:10px;animation:fup .8s ease .4s both;position:relative;z-index:1}
+.t1{display:block;background:linear-gradient(135deg,#fff 0%,#e9d5ff 60%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.t2{display:block;background:linear-gradient(135deg,#ff2d78,#9b30ff,#00fff0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 40px rgba(155,48,255,.6))}
+/* GLITCH */
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%}
+.glitch::before{background:linear-gradient(135deg,#ff2d78,#9b30ff,#00fff0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;left:3px;clip-path:polygon(0 0,100% 0,100% 35%,0 35%);animation:g1 3s infinite linear alternate-reverse}
+.glitch::after{background:linear-gradient(135deg,#00fff0,#9b30ff,#ff2d78);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;left:-3px;clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);animation:g2 2s infinite linear alternate-reverse}
+@keyframes g1{0%{clip-path:polygon(0 0,100% 0,100% 35%,0 35%);transform:translate(-2px)}50%{clip-path:polygon(0 20%,100% 20%,100% 50%,0 50%);transform:translate(2px)}100%{clip-path:polygon(0 55%,100% 55%,100% 75%,0 75%);transform:translate(-1px)}}
+@keyframes g2{0%{clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);transform:translate(2px)}50%{clip-path:polygon(0 40%,100% 40%,100% 70%,0 70%);transform:translate(-2px)}100%{clip-path:polygon(0 10%,100% 10%,100% 40%,0 40%);transform:translate(1px)}}
+.hero-sub{color:var(--mu);font-size:1rem;max-width:450px;margin:20px auto 40px;line-height:1.7;font-weight:500;animation:fup .8s ease .6s both;letter-spacing:.5px}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fup .8s ease .8s both}
+@keyframes fup{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+/* FLOATING 3D V */
+.hero-v{position:absolute;right:6%;top:50%;transform:translateY(-50%);pointer-events:none;animation:fup .8s ease 1s both}
+.v-float{animation:vf 4s ease-in-out infinite}
+@keyframes vf{0%,100%{transform:translateY(0) rotateY(-12deg) rotateX(5deg) rotate(-2deg)}50%{transform:translateY(-18px) rotateY(12deg) rotateX(-5deg) rotate(2deg)}}
+.v-float svg{filter:drop-shadow(0 0 50px rgba(155,48,255,.9)) drop-shadow(0 0 90px rgba(255,45,120,.5))}
+/* SCROLL */
+.scroll-ind{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--mu);font-size:.6rem;letter-spacing:3px;font-family:'Share Tech Mono',monospace;animation:fup 1s ease 1.4s both;z-index:2}
+.scroll-line{width:1px;height:38px;background:linear-gradient(to bottom,var(--p),transparent);animation:sl2 2s ease-in-out infinite}
+@keyframes sl2{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* BTNS */
+.btn-primary{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:14px 36px;border-radius:4px;border:none;cursor:pointer;font-size:.9rem;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:all .3s;box-shadow:0 0 30px rgba(155,48,255,.3)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(155,48,255,.6),0 0 80px rgba(155,48,255,.2)}
+.btn-dc{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(155,48,255,.5);color:#fff;padding:14px 28px;border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:all .3s}
+.btn-dc:hover{background:rgba(155,48,255,.1);border-color:var(--p);transform:translateY(-3px);box-shadow:0 10px 30px rgba(155,48,255,.3)}
+.btn-dc-big{display:inline-flex;align-items:center;gap:8px;background:#5865F2;color:#fff;padding:12px 24px;border-radius:4px;border:none;cursor:pointer;font-size:.88rem;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:all .3s;justify-content:center}
+.btn-dc-big:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 8px 24px rgba(88,101,242,.4)}
+
+/* DIVIDER */
+.dvd{height:1px;background:linear-gradient(90deg,transparent,rgba(155,48,255,.5),rgba(192,132,252,.3),transparent);position:relative;z-index:1}
+
+/* SECTIONS */
+section{padding:90px 40px;position:relative;z-index:1}
+.sec-tag{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(155,48,255,.3);color:#9b72ff;padding:4px 14px;border-radius:2px;font-size:.66rem;margin-bottom:14px;font-family:'Share Tech Mono',monospace;letter-spacing:3px}
+.sdot{width:5px;height:5px;background:var(--p);border-radius:50%;box-shadow:0 0 6px var(--p);animation:pls 2s infinite}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);text-align:center;margin-bottom:8px;letter-spacing:4px;background:linear-gradient(135deg,#fff,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-sub{text-align:center;color:var(--mu);font-size:.88rem;margin-bottom:48px;letter-spacing:.5px;font-weight:500}
+
+/* PRODUCTS */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .4s cubic-bezier(.23,1,.32,1);position:relative}
+.pcard::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(155,48,255,.06),rgba(192,132,252,.04));opacity:0;transition:opacity .3s;pointer-events:none;border-radius:8px}
+.pcard:hover{transform:translateY(-10px) scale(1.018);border-color:rgba(155,48,255,.6);box-shadow:0 24px 70px rgba(155,48,255,.25),0 0 0 1px rgba(155,48,255,.15),inset 0 1px 0 rgba(255,255,255,.06)}
+.pcard:hover::after{opacity:1}
+
+/* THUMBNAIL — beautiful 3D holographic violet */
+.pc-thumb{height:190px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* Deep space bg */
+.pc-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,#1a0040,#0a0018 50%,#050010)}
+/* Animated aurora layers */
+.pc-aurora1{position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 50% 30%,rgba(155,48,255,.45),transparent 65%);animation:aur1 4s ease-in-out infinite alternate}
+.pc-aurora2{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 70%,rgba(109,40,217,.35),transparent 55%);animation:aur2 5s ease-in-out infinite alternate-reverse}
+.pc-aurora3{position:absolute;inset:0;background:radial-gradient(ellipse 50% 50% at 20% 80%,rgba(192,132,252,.2),transparent 50%);animation:aur1 6s ease-in-out infinite alternate}
+@keyframes aur1{0%{opacity:.6;transform:scale(1)}100%{opacity:1;transform:scale(1.1)}}
+@keyframes aur2{0%{opacity:.4;transform:scale(1.05)}100%{opacity:.8;transform:scale(.95)}}
+/* Perspective grid floor */
+.pc-grid{position:absolute;bottom:0;left:0;right:0;height:55%;background-image:linear-gradient(rgba(155,48,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(155,48,255,.18) 1px,transparent 1px);background-size:22px 22px;transform:perspective(200px) rotateX(55deg);transform-origin:bottom center;animation:gscroll 3s linear infinite;opacity:.8}
+@keyframes gscroll{0%{background-position:0 0}100%{background-position:0 22px}}
+/* Rim light top */
+.pc-rim{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,.8),rgba(155,48,255,1),rgba(192,132,252,.8),transparent)}
+/* Center V logo 3D */
+.pc-logo{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 0 20px rgba(155,48,255,.9)) drop-shadow(0 8px 30px rgba(109,40,217,.6));transition:transform .3s,filter .3s}
+.pcard:hover .pc-logo{transform:translateY(-6px) scale(1.08);filter:drop-shadow(0 0 30px rgba(155,48,255,1)) drop-shadow(0 12px 40px rgba(155,48,255,.7))}
+/* Orb glow behind V */
+.pc-orb{position:absolute;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(155,48,255,.5),transparent 70%);z-index:1;animation:orbP 3s ease-in-out infinite alternate}
+@keyframes orbP{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.1);opacity:1}}
+/* Floating particles */
+.pc-particles{position:absolute;inset:0;z-index:1;pointer-events:none}
+.pc-p{position:absolute;width:2px;height:2px;background:rgba(192,132,252,.8);border-radius:50%;animation:pfloat linear infinite}
+@keyframes pfloat{0%{transform:translateY(100%) translateX(0);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(-20px) translateX(var(--dx,10px));opacity:0}}
+.pc-brand{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:3px;background:linear-gradient(135deg,#fff,#e9d5ff,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:5px;position:relative;z-index:2}
+.pc-sub{font-size:.42rem;letter-spacing:2.5px;color:rgba(192,132,252,.7);text-transform:uppercase;margin-top:2px;font-family:'Share Tech Mono',monospace;position:relative;z-index:2}
+
+.pc-info{padding:12px 14px 0;display:flex;align-items:center;justify-content:space-between}
+.pc-name{font-weight:700;font-size:.9rem;letter-spacing:.5px}
+.badge{display:flex;align-items:center;gap:4px;font-size:.6rem;color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:2px 8px;border-radius:2px;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.bdot{width:5px;height:5px;background:#22c55e;border-radius:50%;box-shadow:0 0 6px #22c55e;animation:pls 2s infinite}
+.pc-sys{padding:7px 14px}
+.pc-sys-t{font-size:.57rem;color:var(--mu);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;font-family:'Share Tech Mono',monospace}
+.pc-sys ul{list-style:none;display:flex;flex-direction:column;gap:2px}
+.pc-sys li{font-size:.67rem;color:#7070a0;display:flex;align-items:center;gap:5px}
+.pc-sys li::before{content:'›';color:var(--p);font-size:.75rem;font-weight:700}
+.pc-footer{padding:10px 14px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(155,48,255,.07);margin-top:8px}
+.pc-pl{font-size:.6rem;color:var(--mu);font-family:'Share Tech Mono',monospace}
+.pc-price{color:var(--p3);font-weight:700;font-size:1.1rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;text-shadow:0 0 12px rgba(155,48,255,.5)}
+.btn-buy{background:linear-gradient(135deg,var(--p),var(--p2));border:none;color:#fff;padding:7px 18px;border-radius:3px;cursor:pointer;font-size:.77rem;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:1px;text-transform:uppercase;transition:all .3s;box-shadow:0 0 12px rgba(155,48,255,.3)}
+.btn-buy:hover{transform:scale(1.05);box-shadow:0 0 24px rgba(155,48,255,.6)}
+
+/* HOW */
+.steps-row{display:flex;align-items:flex-start;justify-content:center;max-width:950px;margin:0 auto}
+.step{flex:1;text-align:center;padding:0 20px}
+.step-nw{display:flex;align-items:center;justify-content:center;margin-bottom:22px;position:relative}
+.step-n{width:58px;height:58px;border:2px solid var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;box-shadow:0 0 25px rgba(155,48,255,.4),inset 0 0 25px rgba(155,48,255,.08);z-index:1;background:rgba(155,48,255,.07);position:relative}
+.step-n::before{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(155,48,255,.2);animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.step-line{position:absolute;top:29px;left:calc(50% + 29px);right:calc(-50% + 29px);height:1px;background:linear-gradient(90deg,rgba(155,48,255,.5),rgba(155,48,255,.08))}
+.step:last-child .step-line{display:none}
+.step h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:10px}
+.step p{color:var(--mu);font-size:.85rem;line-height:1.7;font-weight:500}
+
+/* CONTACT */
+.cc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:36px;max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px;position:relative;overflow:hidden}
+.cc::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(155,48,255,.07),transparent 60%);pointer-events:none}
+.dc-profile{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.02);border:1px solid rgba(155,48,255,.12);border-radius:6px;padding:16px 20px;width:100%;position:relative;z-index:1}
+.dc-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a0a2e,#3b0764);display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid var(--p);flex-shrink:0;box-shadow:0 0 15px rgba(155,48,255,.4)}
+.dc-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+.on-dot{width:9px;height:9px;background:#22c55e;border-radius:50%;box-shadow:0 0 8px #22c55e;animation:pls 2s infinite}
+.dc-role{font-size:.68rem;color:var(--mu);margin-top:2px;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.cc-note{color:var(--mu);font-size:.88rem;text-align:center;line-height:1.7;position:relative;z-index:1;font-weight:500}
+
+/* VOUCHES */
+.vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1100px;margin:0 auto 28px}
+.vc{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:all .3s;position:relative;overflow:hidden}
+.vc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--p3));transform:scaleX(0);transition:transform .3s;transform-origin:left}
+.vc:hover{border-color:rgba(155,48,255,.3);transform:translateY(-4px);box-shadow:0 10px 30px rgba(155,48,255,.1)}
+.vc:hover::before{transform:scaleX(1)}
+.vh{display:flex;align-items:center;gap:10px}
+.vav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;color:#fff;flex-shrink:0;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.vuser{font-weight:700;font-size:.83rem;letter-spacing:.5px}
+.vdate{font-size:.62rem;color:var(--mu);font-family:'Share Tech Mono',monospace}
+.vstars{color:var(--p);font-size:.8rem;letter-spacing:2px;margin-left:auto;text-shadow:0 0 8px rgba(155,48,255,.5)}
+.vtxt{color:#8888b0;font-size:.82rem;line-height:1.65;font-style:italic}
+.vtag{display:inline-flex;align-items:center;gap:5px;background:rgba(155,48,255,.07);border:1px solid rgba(155,48,255,.22);color:#9b72ff;padding:3px 10px;border-radius:2px;font-size:.62rem;font-weight:700;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.pag{display:flex;align-items:center;gap:12px;justify-content:center;margin-top:24px}
+.pbtn{background:transparent;border:1px solid rgba(155,48,255,.3);color:#fff;width:36px;height:36px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-size:1.1rem}
+.pbtn:hover{background:rgba(155,48,255,.15);border-color:var(--p);box-shadow:0 0 12px rgba(155,48,255,.3)}
+.pinfo{color:var(--mu);font-size:.74rem;font-family:'Share Tech Mono',monospace;letter-spacing:2px}
+
+/* FAQ */
+.faq-list{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.fi{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color .3s}
+.fi.open{border-color:rgba(155,48,255,.4)}
+.fq{padding:18px 22px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.9rem;letter-spacing:.5px;transition:color .2s;font-family:'Rajdhani',sans-serif}
+.fq:hover{color:#c084fc}
+.fi-icon{color:var(--p);font-size:1.2rem;transition:transform .3s}
+.fa{display:none;padding:0 22px 18px;color:var(--mu);font-size:.85rem;line-height:1.7;font-weight:500}
+.fi.open .fa{display:block}
+.fi.open .fi-icon{transform:rotate(45deg)}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid rgba(155,48,255,.08);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.fl{display:flex;align-items:center;gap:10px;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;text-decoration:none;background:linear-gradient(135deg,#fff,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.flinks{display:flex;gap:24px}
+.flinks a{color:var(--mu);text-decoration:none;font-size:.78rem;transition:color .2s;font-weight:600;letter-spacing:.5px}
+.flinks a:hover{color:#fff}
+.fright{color:var(--mu);font-size:.72rem;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+
+/* PRODUCT MODAL */
+.ov{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:20px}
+.ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid rgba(155,48,255,.2);border-radius:8px;width:100%;max-width:820px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;animation:mIn .3s ease;position:relative}
+@keyframes mIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.ml{background:linear-gradient(135deg,#060012,#120032,#080020);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 26px;gap:10px;position:relative;overflow:hidden}
+.ml-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(155,48,255,.2),transparent 70%);pointer-events:none}
+.ml-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(155,48,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(155,48,255,.06) 1px,transparent 1px);background-size:18px 18px;animation:gm 6s linear infinite;pointer-events:none}
+.ml-v{position:relative;z-index:1;animation:vf 4s ease-in-out infinite}
+.ml-brand{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;background:linear-gradient(135deg,#e9d5ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:1;text-align:center}
+.ml-tag{font-size:.52rem;letter-spacing:3px;color:#9b72ff;text-transform:uppercase;position:relative;z-index:1;font-family:'Share Tech Mono',monospace}
+.ml-name{font-family:'Bebas Neue',sans-serif;font-weight:700;font-size:1rem;color:#fff;position:relative;z-index:1;text-align:center;margin-top:4px;letter-spacing:1px}
+.ml-sys{position:relative;z-index:1;width:100%;margin-top:10px}
+.ml-sys p{font-size:.6rem;color:var(--mu);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;font-family:'Share Tech Mono',monospace}
+.ml-sys ul{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ml-sys li{font-size:.68rem;color:#8888b0;display:flex;align-items:center;gap:6px}
+.ml-sys li::before{content:'›';color:var(--p);font-size:.75rem;font-weight:700}
+.mr{padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;max-height:90vh}
+.mcl{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:#888;width:28px;height:28px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;z-index:10;transition:color .2s}
+.mcl:hover{color:#fff}
+.mstars{color:var(--p);font-size:.9rem;letter-spacing:3px;text-shadow:0 0 8px rgba(155,48,255,.5)}
+.mprice{font-family:'Bebas Neue',sans-serif;font-weight:700;font-size:2rem;color:var(--p);text-shadow:0 0 20px rgba(155,48,255,.5);letter-spacing:2px}
+.vl-label{font-size:.72rem;color:var(--mu);font-weight:700;margin-bottom:6px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.vl{display:flex;flex-direction:column;gap:7px}
+.vi{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .2s}
+.vi:hover,.vi.active{border-color:var(--p);background:rgba(155,48,255,.08)}
+.vi-name{font-size:.86rem;font-weight:600;letter-spacing:.5px}
+.vi-price{color:var(--p);font-weight:700;font-size:.88rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.pay-label{font-size:.72rem;color:var(--mu);font-weight:700;margin-bottom:6px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.pay-btns{display:flex;flex-direction:column;gap:8px}
+.pbtn2{width:100%;padding:12px 16px;border-radius:6px;border:none;cursor:pointer;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+.pbtn2:hover{transform:translateY(-2px)}
+.ppp{background:linear-gradient(135deg,#003087,#0070ba);color:#fff}
+.ppp:hover{box-shadow:0 8px 24px rgba(0,48,135,.5)}
+.pltc{background:linear-gradient(135deg,#1a3a6b,#345d9d);color:#fff}
+.pltc:hover{box-shadow:0 8px 24px rgba(52,93,157,.5)}
+.minfo{background:rgba(155,48,255,.06);border:1px solid rgba(155,48,255,.2);border-radius:6px;padding:10px 14px;font-size:.76rem;color:#9b72ff;line-height:1.6;font-family:'Share Tech Mono',monospace}
+
+/* CART */
+.cov{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:20px}
+.cov.open{display:flex}
+.cbox{background:var(--bg2);border:1px solid rgba(155,48,255,.2);border-radius:8px;width:100%;max-width:480px;padding:28px;display:flex;flex-direction:column;gap:16px;animation:mIn .3s ease;position:relative}
+.ccl{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:#888;width:28px;height:28px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:color .2s}
+.ccl:hover{color:#fff}
+.ctitle{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;background:linear-gradient(135deg,#fff,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cempty{color:var(--mu);font-size:.88rem;text-align:center;padding:24px;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.citem{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.citem-n{font-size:.88rem;font-weight:700;letter-spacing:.5px}
+.citem-v{font-size:.7rem;color:var(--mu);font-family:'Share Tech Mono',monospace}
+.citem-p{color:var(--p);font-weight:700;font-size:.9rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.citem-d{background:none;border:none;color:var(--mu);cursor:pointer;font-size:1rem;transition:color .2s;margin-left:10px}
+.citem-d:hover{color:#ef4444}
+.ctotal{border-top:1px solid rgba(155,48,255,.1);padding-top:14px;display:flex;justify-content:space-between;align-items:center}
+.ctotal-l{font-size:.78rem;color:var(--mu);font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.ctotal-p{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--p);text-shadow:0 0 12px rgba(155,48,255,.4);letter-spacing:2px}
+
+/* PAY POPUP */
+.pov{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.92);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:20px}
+.pov.open{display:flex}
+.pbox{background:var(--bg2);border:1px solid rgba(155,48,255,.2);border-radius:8px;padding:28px;max-width:460px;width:100%;position:relative;animation:mIn .3s ease;display:flex;flex-direction:column;gap:14px}
+.pcl{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:#888;width:28px;height:28px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:color .2s}
+.pcl:hover{color:#fff}
+.ptitle{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px}
+.pamount{color:var(--p);font-family:'Bebas Neue',sans-serif;font-size:1.8rem;text-shadow:0 0 20px rgba(155,48,255,.5);letter-spacing:3px}
+.pstep{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.psn{width:22px;height:22px;background:linear-gradient(135deg,var(--p),var(--p2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.pst{font-size:.8rem;color:#a0a0c0;line-height:1.65}
+.pst strong{color:#fff;display:block;margin-bottom:2px;font-family:'Rajdhani',sans-serif;letter-spacing:.5px}
+.paddr{background:rgba(0,0,0,.3);border:1px solid rgba(155,48,255,.3);border-radius:4px;padding:10px 12px;font-size:.72rem;color:#c084fc;word-break:break-all;font-family:'Share Tech Mono',monospace;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.cbtn2{background:linear-gradient(135deg,var(--p),var(--pk));border:none;color:#fff;padding:5px 12px;border-radius:3px;cursor:pointer;font-size:.68rem;font-weight:700;white-space:nowrap;flex-shrink:0;font-family:'Rajdhani',sans-serif;letter-spacing:1px;transition:opacity .2s}
+.cbtn2:hover{opacity:.85}
+.pwarn{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:6px;padding:12px 14px}
+.pwarn-t{font-size:.78rem;font-weight:700;color:#fbbf24;margin-bottom:6px;font-family:'Rajdhani',sans-serif;letter-spacing:.5px}
+.pwarn ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.pwarn li{font-size:.76rem;color:#fcd34d;display:flex;gap:6px;font-family:'Share Tech Mono',monospace}
+.pwarn li::before{content:'!'}
+.cok{color:#22c55e;font-size:.72rem;text-align:center;font-weight:700;display:none;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(155,48,255,.3);border-radius:2px}
+
+@media(max-width:900px){
+  .pgrid,.vgrid{grid-template-columns:1fr 1fr}
+  .steps-row{flex-direction:column;align-items:center;gap:32px}
+  .step-line{display:none}
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .modal{grid-template-columns:1fr}
+  .ml{display:none}
+  footer{flex-direction:column;gap:14px;text-align:center}
+  .hero-v{display:none}
+}
+@media(max-width:600px){
+  .pgrid,.vgrid{grid-template-columns:1fr}
+  section{padding:60px 20px}
+}
+</style>
+</head>
+<body>
+<div class="sl"></div>
+<canvas id="bgC"></canvas>
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- SVG DEFS -->
+<svg style="display:none"><defs>
+<linearGradient id="vg" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0%" stop-color="#f0abfc"/>
+  <stop offset="50%" stop-color="#c026d3"/>
+  <stop offset="100%" stop-color="#7e22ce"/>
+</linearGradient>
+</defs></svg>
+
+
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 100 110" fill="none" width="28" height="28"><path d="M5 5C20 5 30 5 30 5 38 5 42 12 45 22L50 40 55 22C58 12 62 5 70 5 80 5 95 5 95 5L65 85C62 93 55 98 50 98 45 98 38 93 35 85Z" fill="url(#vg)"/></svg>
+    <span class="logo-t">LvxShop</span>
+  </a>
+  <div class="nav-links">
+    <a href="#products">Produits</a>
+    <a href="#how">Comment ça marche</a>
+    <a href="#vouches">Vouches</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-r">
+    <button class="btn-cart" onclick="openCart()">
+      🛒 Panier
+      <span class="cbadge" id="cartBadge">0</span>
+    </button>
+    <a href="https://discord.gg/2jrMpnCgt9" target="_blank" class="btn-dc-nav">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      Discord
+    </a>
+    <button class="btn-dash">👤 Dashboard</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="hbdot"></span> LVXSHOP — PRODUITS PREMIUM UNDETECTED</div>
+  <div class="hero-title">
+    <span class="t1">BECOME</span>
+    <span class="t2 glitch" data-text="STRONGER">STRONGER</span>
+  </div>
+  <p class="hero-sub">Turn towards becomes stronger. Débloquez votre plein potentiel avec les produits premium de LvxShop.</p>
+  <div class="hero-btns">
+    <a href="#products" class="btn-primary">⚡ Voir les produits</a>
+    <a href="https://discord.gg/2jrMpnCgt9" target="_blank" class="btn-dc">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      Discord
+    </a>
+  </div>
+  <!-- 3D V -->
+  <div class="hero-v">
+    <div class="v-float">
+      <svg viewBox="0 0 200 220" fill="none" width="260" height="260">
+        <defs>
+          <linearGradient id="vg2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f0abfc"/>
+            <stop offset="40%" stop-color="#c026d3"/>
+            <stop offset="100%" stop-color="#6d28d9"/>
+          </linearGradient>
+          <filter id="glow2">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="M10 10C10 10 40 10 60 10C76 10 84 24 90 44L100 80 110 44C116 24 124 10 140 10C160 10 190 10 190 10L130 170C124 186 110 196 100 196C90 196 76 186 70 170Z" fill="url(#vg2)" filter="url(#glow2)"/>
+        <path d="M70 10L100 70 130 10Z" fill="rgba(255,255,255,0.15)"/>
+        <path d="M10 10C10 10 40 10 60 10C76 10 84 24 90 44L100 80 110 44C116 24 124 10 140 10C160 10 190 10 190 10L130 170C124 186 110 196 100 196C90 196 76 186 70 170Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+  <div class="scroll-ind">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="dvd"></div>
+
+<!-- PRODUCTS -->
+<section id="products" style="background:var(--bg)">
+  <div style="text-align:center">
+    <div class="sec-tag"><span class="sdot"></span> NOS PRODUITS</div>
+    <h2 class="sec-title">Featured Products</h2>
+    <p class="sec-sub">Tous nos produits sont undetected et mis à jour régulièrement.</p>
+  </div>
+  <div class="pgrid" id="pgrid"></div>
+</section>
+
+<div class="dvd"></div>
+
+<!-- HOW -->
+<section id="how" style="background:var(--bg2)">
+  <div style="text-align:center">
+    <h2 class="sec-title">Comment ça marche ?</h2>
+    <p class="sec-sub">Simple en 3 étapes.</p>
+  </div>
+  <div class="steps-row">
+    <div class="step">
+      <div class="step-nw"><div class="step-n">1</div><div class="step-line"></div></div>
+      <h3>Choisissez un produit</h3>
+      <p>Parcourez notre catalogue, sélectionnez le produit et la durée qui vous convient.</p>
+    </div>
+    <div class="step">
+      <div class="step-nw"><div class="step-n">2</div><div class="step-line"></div></div>
+      <h3>Payez via PayPal ou LTC</h3>
+      <p>Envoyez le paiement en <strong style="color:#fff">ami/proche</strong> sur PayPal ou en LTC. Aucune note dans le virement.</p>
+    </div>
+    <div class="step">
+      <div class="step-nw"><div class="step-n">3</div></div>
+      <h3>Envoyez la preuve</h3>
+      <p>Screenshot du paiement sur notre Discord. Votre clé vous sera livrée immédiatement.</p>
+    </div>
+  </div>
+</section>
+
+<div class="dvd"></div>
+
+<!-- CONTACT -->
+<section style="background:var(--bg)">
+  <div style="text-align:center;margin-bottom:32px">
+    <h2 class="sec-title">Nous contacter</h2>
+    <p class="sec-sub">Après paiement, contactez-nous sur Discord pour recevoir votre clé.</p>
+  </div>
+  <div class="cc">
+    <div class="dc-profile">
+      <div class="dc-av">🐱</div>
+      <div style="flex:1">
+        <div class="dc-name">Lirvax <span class="on-dot"></span></div>
+        <div class="dc-role">OWNER · LVXSHOP</div>
+      </div>
+      <a href="https://discord.gg/2jrMpnCgt9" target="_blank" class="btn-dc-big" style="padding:9px 18px;font-size:.8rem">Contacter</a>
+    </div>
+    <p class="cc-note">Envoyez un <strong style="color:#fff">screenshot de votre preuve de paiement</strong> en DM ou sur le serveur Discord. La clé sera livrée rapidement.</p>
+    <a href="https://discord.gg/2jrMpnCgt9" target="_blank" class="btn-dc-big" style="width:100%">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      Rejoindre le Discord
+    </a>
+  </div>
+</section>
+
+<div class="dvd"></div>
+
+<!-- VOUCHES -->
+<section id="vouches" style="background:var(--bg2)">
+  <div style="text-align:center">
+    <div class="sec-tag"><span class="sdot"></span> AVIS CLIENTS</div>
+    <h2 class="sec-title">Vouches</h2>
+    <p class="sec-sub">Ce que nos clients disent de LvxShop.</p>
+  </div>
+  <div class="vgrid" id="vgrid"></div>
+  <div class="pag">
+    <button class="pbtn" onclick="prevPg()">‹</button>
+    <span class="pinfo" id="pinfo">1 OF 2</span>
+    <button class="pbtn" onclick="nextPg()">›</button>
+  </div>
+</section>
+
+<div class="dvd"></div>
+
+<!-- FAQ -->
+<section id="faq" style="background:var(--bg)">
+  <div style="text-align:center">
+    <h2 class="sec-title">Questions & Réponses</h2>
+    <p class="sec-sub">Tout ce que vous devez savoir.</p>
+  </div>
+  <div class="faq-list">
+    <div class="fi"><div class="fq" onclick="tfaq(this)">Comment payer ?<span class="fi-icon">+</span></div><div class="fa">Nous acceptons <strong>PayPal (en ami/proche)</strong> et <strong>Litecoin (LTC)</strong>. Après paiement, envoyez une preuve screenshot sur notre Discord.</div></div>
+    <div class="fi"><div class="fq" onclick="tfaq(this)">Pourquoi payer en ami/proche sur PayPal ?<span class="fi-icon">+</span></div><div class="fa">Pour éviter les frais de transaction. N'ajoutez <strong>aucune note</strong> dans le virement.</div></div>
+    <div class="fi"><div class="fq" onclick="tfaq(this)">Comment recevoir ma clé ?<span class="fi-icon">+</span></div><div class="fa">Envoyez un <strong>screenshot de votre paiement</strong> sur notre Discord. La clé vous sera envoyée immédiatement par notre owner.</div></div>
+    <div class="fi"><div class="fq" onclick="tfaq(this)">Les produits sont-ils undetected ?<span class="fi-icon">+</span></div><div class="fa">Oui, tous nos produits sont régulièrement mis à jour. Contactez-nous sur Discord pour le statut en temps réel.</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a class="fl" href="#">
+    <svg viewBox="0 0 100 110" fill="none" width="22" height="22"><path d="M5 5C20 5 30 5 30 5 38 5 42 12 45 22L50 40 55 22C58 12 62 5 70 5 80 5 95 5 95 5L65 85C62 93 55 98 50 98 45 98 38 93 35 85Z" fill="url(#vg)"/></svg>
+    LvxShop
+  </a>
+  <div class="flinks">
+    <a href="#products">Produits</a>
+    <a href="#vouches">Vouches</a>
+    <a href="https://discord.gg/2jrMpnCgt9" target="_blank">Discord</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="fright">© 2026 LVXSHOP — ALL RIGHTS RESERVED</div>
+</footer>
+
+<!-- PRODUCT MODAL -->
+<div class="ov" id="prodOv">
+  <div class="modal">
+    <button class="mcl" onclick="closeMod()">✕</button>
+    <div class="ml">
+      <div class="ml-glow"></div>
+      <div class="ml-grid"></div>
+      <svg class="ml-v" viewBox="0 0 100 110" fill="none" width="60" height="60"><path d="M5 5C20 5 30 5 30 5 38 5 42 12 45 22L50 40 55 22C58 12 62 5 70 5 80 5 95 5 95 5L65 85C62 93 55 98 50 98 45 98 38 93 35 85Z" fill="url(#vg)"/><path d="M35 5L50 35 65 5Z" fill="rgba(255,255,255,.15)"/></svg>
+      <div class="ml-brand">LVXSHOP</div>
+      <div class="ml-tag">BECOME STRONGER</div>
+      <div class="ml-name" id="mName"></div>
+      <div class="ml-sys" id="mSys"></div>
+    </div>
+    <div class="mr">
+      <div class="mstars">★★★★★</div>
+      <div class="mprice" id="mPrice"></div>
+      <div>
+        <div class="vl-label">Choisissez votre durée</div>
+        <div class="vl" id="mVars"></div>
+      </div>
+      <div>
+        <div class="pay-label">Moyen de paiement</div>
+        <div class="pay-btns">
+          <button class="pbtn2 ppp" onclick="openPay('pp')">💳 Payer via PayPal (Ami/Proche)</button>
+          <button class="pbtn2 pltc" onclick="openPay('ltc')">🪙 Payer en LTC (Litecoin)</button>
+        </div>
+      </div>
+      <div class="minfo">⬡ Envoyez votre preuve de paiement sur Discord pour recevoir votre clé instantanément.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="cov" id="cartOv">
+  <div class="cbox">
+    <button class="ccl" onclick="closeCart()">✕</button>
+    <div class="ctitle">🛒 Mon Panier</div>
+    <div id="cartItems"><div class="cempty">// PANIER VIDE</div></div>
+    <div class="ctotal" id="cartTotal" style="display:none">
+      <span class="ctotal-l">TOTAL</span>
+      <span class="ctotal-p" id="cartTotalP">0,00 €</span>
+    </div>
+    <a href="https://discord.gg/2jrMpnCgt9" target="_blank" class="btn-dc-big" id="cartCO" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      Finaliser sur Discord
+    </a>
+  </div>
+</div>
+
+<!-- PAY POPUP -->
+<div class="pov" id="payOv">
+  <div class="pbox">
+    <button class="pcl" onclick="closePay()">✕</button>
+    <div class="ptitle" id="payTitle"></div>
+    <div class="pamount" id="payAmt"></div>
+    <div id="paySteps"></div>
+    <div class="pwarn">
+      <div class="pwarn-t">⚠ IMPORTANT</div>
+      <ul id="payWarns"></ul>
+    </div>
+    <a href="https://discord.gg/2jrMpnCgt9" target="_blank" class="btn-dc-big">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+      Envoyer ma preuve sur Discord
+    </a>
+    <div class="cok" id="cok">✓ ADRESSE COPIÉE</div>
+  </div>
+</div>
+
+<script>
+// ── CURSOR ──
+const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+setInterval(()=>{cx+=(mx-cx)*.12;cy+=(my-cy)*.12;cur2.style.left=cx+'px';cur2.style.top=cy+'px'},16);
+
+// ── CANVAS PARTICLES ──
+(function(){
+  const c=document.getElementById('bgC'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;pts=[];for(let i=0;i<80;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.3,op:Math.random()*.6+.2})}
+  resize();window.addEventListener('resize',resize);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // gradient bg
+    const g=ctx.createRadialGradient(W*.2,H*.4,0,W*.2,H*.4,W*.7);
+    g.addColorStop(0,'rgba(155,48,255,.04)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    const g2=ctx.createRadialGradient(W*.8,H*.3,0,W*.8,H*.3,W*.5);
+    g2.addColorStop(0,'rgba(255,45,120,.03)');g2.addColorStop(1,'transparent');
+    ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(155,48,255,${p.op})`;ctx.fill();
+    });
+    // connect nearby
+    pts.forEach((a,i)=>{pts.slice(i+1).forEach(b=>{
+      const d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<120){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(155,48,255,${.15*(1-d/120)})`;ctx.lineWidth=.5;ctx.stroke()}
+    })});
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+
+// ── DATA ──
+const PRODUCTS=[
+  {name:'Permanent',tag:'PERMANENT',sys:['Windows 10 & 11 (23H2)','AMD & Intel Processors','No Windows Reinstall','No BIOS Flash','VGK Emulator'],variants:[{n:'One Time',p:'10,00 €'},{n:'Lifetime',p:'15,00 €'}]},
+  {name:'One-Click Virtualizer',tag:'ONE-CLICK VIRTUALIZER',sys:['Windows 10 & 11 (23H2)','AMD & Intel Processors','No Windows Reinstall','No BIOS Flash','VGK Emulator'],variants:[{n:'1 Jour',p:'9,99 €'},{n:'1 Semaine',p:'15,99 €'},{n:'1 Mois',p:'30,99 €'},{n:'Lifetime',p:'114,99 €'}]},
+  {name:'Ravage',tag:'RAVAGE',sys:['Windows 10 & 11','AMD & Intel Processors','All Resolutions Supported','Supports HVCI'],variants:[{n:'1 Jour',p:'6,99 €'},{n:'1 Semaine',p:'19,99 €'},{n:'1 Mois',p:'44,99 €'},{n:'Lifetime',p:'69,99 €'}]},
+  {name:'Unlock All',tag:'UNLOCK ALL',sys:['Windows 10 & 11','AMD & Intel Processors','All Motherboards Supported','Supports HVCI'],variants:[{n:'1 Jour',p:'2,99 €'},{n:'1 Semaine',p:'6,99 €'},{n:'1 Mois',p:'15,99 €'},{n:'Lifetime',p:'29,99 €'}]},
+  {name:'One-Click',tag:'ONE-CLICK',sys:['Windows 10 & 11 (23H2)','AMD & Intel Processors','No Windows Reinstall','No BIOS Flash','VGK Emulator'],variants:[{n:'1 Jour',p:'9,99 €'},{n:'1 Semaine',p:'24,99 €'},{n:'1 Mois',p:'54,99 €'},{n:'Lifetime',p:'99,99 €'}]},
+];
+const VOUCHES=[
+  {av:'Sh',user:'xXShadow_Fr',date:'Mar 2026',txt:'"Produit reçu en moins de 2 minutes, owner très réactif. Je recommande à 100% !"',tag:'One-Click Virtualizer'},
+  {av:'Nk',user:'Niko_Gaming',date:'Mar 2026',txt:'"Unlock All à 2,99€ c\'est imbattable. Fonctionne parfaitement sur ma config. +rep 🔥"',tag:'Unlock All'},
+  {av:'Zk',user:'Zakaria_pvp',date:'Fév 2026',txt:'"Ravage marche du feu de dieu, aucun souci depuis 1 mois. Support au top !"',tag:'Ravage'},
+  {av:'Ml',user:'MaloFR_',date:'Fév 2026',txt:'"Pris le Permanent, installation facile. Livraison instantanée. Shop de confiance 👌"',tag:'Permanent'},
+  {av:'Rx',user:'RoxaneFPS',date:'Jan 2026',txt:'"Paiement LTC rapide, clé reçue direct. Tout s\'est très bien passé. 5 étoiles."',tag:'One-Click'},
+  {av:'Jb',user:'JBapt_44',date:'Jan 2026',txt:'"Meilleur shop du moment. Prix imbattables et owner sérieux. Reviendrai !"',tag:'Ravage'},
+  {av:'Ky',user:'KylaFR',date:'Jan 2026',txt:'"Commande passée le soir, clé reçue en 3 minutes. Produit nickel, 0 problème."',tag:'Unlock All'},
+  {av:'Th',user:'TheoLtx',date:'Déc 2025',txt:'"Très bon shop, le One-Click Virtualizer marche impec. Support disponible."',tag:'One-Click Virtualizer'},
+  {av:'Am',user:'AmineFPS',date:'Déc 2025',txt:'"J\'avais des doutes au début mais le owner est vraiment sérieux. Produit top !"',tag:'Permanent'},
+  {av:'Lu',user:'LucasGG_',date:'Nov 2025',txt:'"3ème achat chez LvxShop, toujours aussi fiable. Les yeux fermés."',tag:'Ravage'},
+  {av:'El',user:'EliotPvp',date:'Nov 2025',txt:'"Livraison rapide, produit fonctionnel direct. Owner sympa sur Discord."',tag:'One-Click'},
+  {av:'Sa',user:'SarahGaming',date:'Oct 2025',txt:'"Unlock All parfait pour ce que je voulais faire. Super rapport qualité/prix !"',tag:'Unlock All'},
+];
+
+// ── BUILD PRODUCTS ──
+const pgrid=document.getElementById('pgrid');
+PRODUCTS.forEach((p,i)=>{
+  const el=document.createElement('div');
+  el.className='pcard';
+  el.innerHTML=`
+    <div class="pc-thumb">
+      <div class="pc-bg"></div>
+      <div class="pc-aurora1"></div><div class="pc-aurora2"></div><div class="pc-aurora3"></div>
+      <div class="pc-grid"></div>
+      <div class="pc-rim"></div>
+      <div class="pc-orb"></div>
+      <div class="pc-particles">
+        <div class="pc-p" style="left:20%;animation-duration:3s;animation-delay:0s;--dx:8px"></div>
+        <div class="pc-p" style="left:40%;animation-duration:4s;animation-delay:.8s;--dx:-5px"></div>
+        <div class="pc-p" style="left:65%;animation-duration:3.5s;animation-delay:.3s;--dx:12px"></div>
+        <div class="pc-p" style="left:80%;animation-duration:5s;animation-delay:1.2s;--dx:-8px"></div>
+      </div>
+      <div class="pc-logo">
+        <svg width="50" height="50" viewBox="0 0 100 110" fill="none"><defs><linearGradient id="vg${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f5d0fe"/><stop offset="50%" stop-color="#a855f7"/><stop offset="100%" stop-color="#6d28d9"/></linearGradient></defs><path d="M5 5C20 5 30 5 30 5 38 5 42 12 45 22L50 40 55 22C58 12 62 5 70 5 80 5 95 5 95 5L65 85C62 93 55 98 50 98 45 98 38 93 35 85Z" fill="url(#vg${i})"/><path d="M35 5L50 35 65 5Z" fill="rgba(255,255,255,.2)"/></svg>
+        <div class="pc-brand">LVXSHOP</div>
+        <div class="pc-sub">${p.tag}</div>
+      </div>
+    </div>
+    <div class="pc-info"><span class="pc-name">${p.name}</span><span class="badge"><span class="bdot"></span>UNDETECTED</span></div>
+    <div class="pc-sys"><div class="pc-sys-t">Systèmes supportés</div><ul>${p.sys.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+    <div class="pc-footer"><div><div class="pc-pl">À partir de</div><div class="pc-price">${p.variants[0].p}</div></div><button class="btn-buy">Buy Now</button></div>`;
+  el.addEventListener('click',()=>openMod(i));
+  pgrid.appendChild(el);
+});
+
+// ── VOUCHES PAGINATION ──
+const PER=6;let page=1;const total=Math.ceil(VOUCHES.length/PER);
+function renderV(){
+  const s=(page-1)*PER,items=VOUCHES.slice(s,s+PER);
+  document.getElementById('vgrid').innerHTML=items.map(v=>`
+    <div class="vc">
+      <div class="vh">
+        <div class="vav">${v.av}</div>
+        <div><div class="vuser">${v.user}</div><div class="vdate">${v.date}</div></div>
+        <div class="vstars">★★★★★</div>
+      </div>
+      <div class="vtxt">${v.txt}</div>
+      <span class="vtag">⚡ ${v.tag}</span>
+    </div>`).join('');
+  document.getElementById('pinfo').textContent=`${page} OF ${total}`;
+}
+function nextPg(){if(page<total){page++;renderV()}}
+function prevPg(){if(page>1){page--;renderV()}}
+renderV();
+
+// ── MODAL ──
+let curPrice='';
+function openMod(idx){
+  const p=PRODUCTS[idx];
+  document.getElementById('mName').textContent=p.name;
+  document.getElementById('mPrice').textContent=p.variants[0].p;
+  curPrice=p.variants[0].p;
+  document.getElementById('mSys').innerHTML=`<p>Systèmes supportés</p><ul>${p.sys.map(s=>`<li>${s}</li>`).join('')}</ul>`;
+  const vl=document.getElementById('mVars');vl.innerHTML='';
+  p.variants.forEach((v,i)=>{
+    const d=document.createElement('div');d.className='vi'+(i===0?' active':'');
+    d.innerHTML=`<span class="vi-name">${v.n} License</span><span class="vi-price">${v.p}</span>`;
+    d.onclick=()=>{document.querySelectorAll('.vi').forEach(x=>x.classList.remove('active'));d.classList.add('active');document.getElementById('mPrice').textContent=v.p;curPrice=v.p};
+    vl.appendChild(d);
+  });
+  document.getElementById('prodOv').classList.add('open');
+}
+function closeMod(){document.getElementById('prodOv').classList.remove('open')}
+document.getElementById('prodOv').addEventListener('click',e=>{if(e.target===document.getElementById('prodOv'))closeMod()});
+
+// ── CART ──
+let cart=[];
+function openCart(){renderCart();document.getElementById('cartOv').classList.add('open')}
+function closeCart(){document.getElementById('cartOv').classList.remove('open')}
+document.getElementById('cartOv').addEventListener('click',e=>{if(e.target===document.getElementById('cartOv'))closeCart()});
+function renderCart(){
+  const el=document.getElementById('cartItems');
+  if(!cart.length){el.innerHTML='<div class="cempty">// PANIER VIDE</div>';document.getElementById('cartTotal').style.display='none';document.getElementById('cartCO').style.display='none';return}
+  el.innerHTML=cart.map((it,i)=>`<div class="citem"><div><div class="citem-n">${it.name}</div><div class="citem-v">${it.variant}</div></div><span class="citem-p">${it.price}</span><button class="citem-d" onclick="rmCart(${i})">✕</button></div>`).join('');
+  const tot=cart.reduce((s,i)=>s+parseFloat(i.price.replace(',','.')),0);
+  document.getElementById('cartTotalP').textContent=tot.toFixed(2).replace('.',',')+' €';
+  document.getElementById('cartTotal').style.display='flex';
+  document.getElementById('cartCO').style.display='flex';
+  document.getElementById('cartBadge').textContent=cart.length;
+}
+function rmCart(i){cart.splice(i,1);document.getElementById('cartBadge').textContent=cart.length;renderCart()}
+
+// ── PAYMENT ──
+function openPay(type){
+  const amt=curPrice;
+  document.getElementById('payAmt').textContent=amt;
+  document.getElementById('cok').style.display='none';
+  if(type==='pp'){
+    document.getElementById('payTitle').textContent='💳 PAIEMENT PAYPAL';
+    document.getElementById('paySteps').innerHTML=`
+      <div class="pstep"><div class="psn">1</div><div class="pst"><strong>Ouvrez PayPal</strong>Allez sur <a href="https://www.paypal.me/Lirvax874" target="_blank" style="color:var(--p)">paypal.me/Lirvax874</a></div></div>
+      <div class="pstep"><div class="psn">2</div><div class="pst"><strong>Envoyez ${amt}</strong>Sélectionnez <span style="color:#fbbf24;font-weight:700">"Envoyer à un ami"</span> — aucune note.</div></div>
+      <div class="pstep"><div class="psn">3</div><div class="pst"><strong>Envoyez la preuve</strong>Screenshot de la confirmation sur notre Discord.</div></div>`;
+    document.getElementById('payWarns').innerHTML=`<li>Sélectionner "Envoyer à un ami" obligatoirement</li><li>Aucune note dans le virement</li><li>Screenshot de preuve obligatoire sur Discord</li>`;
+  }else{
+    document.getElementById('payTitle').textContent='🪙 PAIEMENT LTC';
+    document.getElementById('paySteps').innerHTML=`
+      <div class="pstep"><div class="psn">1</div><div class="pst"><strong>Copiez l'adresse LTC</strong><div class="paddr"><span>LfZmxivkBiehkt7nne9HtiR5Pnw2MLPqf4</span><button class="cbtn2" onclick="cpyLTC()">Copier</button></div></div></div>
+      <div class="pstep"><div class="psn">2</div><div class="pst"><strong>Envoyez ${amt} en LTC</strong>Montant exact depuis votre wallet.</div></div>
+      <div class="pstep"><div class="psn">3</div><div class="pst"><strong>Envoyez la preuve</strong>Hash de transaction ou screenshot sur Discord.</div></div>`;
+    document.getElementById('payWarns').innerHTML=`<li>Envoyer le montant exact en LTC</li><li>Vérifiez bien l'adresse avant d'envoyer</li><li>Screenshot obligatoire sur Discord</li>`;
+  }
+  document.getElementById('payOv').classList.add('open');
+}
+function closePay(){document.getElementById('payOv').classList.remove('open')}
+document.getElementById('payOv').addEventListener('click',e=>{if(e.target===document.getElementById('payOv'))closePay()});
+function cpyLTC(){navigator.clipboard.writeText('LfZmxivkBiehkt7nne9HtiR5Pnw2MLPqf4').then(()=>{const el=document.getElementById('cok');el.style.display='block';setTimeout(()=>el.style.display='none',2500)})}
+
+// ── FAQ ──
+function tfaq(el){el.parentElement.classList.toggle('open')}
+
+// ── SCROLL REVEAL ──
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}})},{threshold:.1});
+document.querySelectorAll('.pcard,.vc,.step,.fi').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='opacity .6s ease, transform .6s ease';obs.observe(el)});
+</script>
+</body>
+</html>
